@@ -53,7 +53,7 @@ class SagePay(object):
 
 		payload = response.read()
 	
-		if "<errorcode>0000</errorcode>" in payload:
+		if "<errorcode>0000</errorcode>" in payload or "<errorcode>9998</errorcode>" in payload:
 			return True		
 		else:
 			print "Error updating SagePay: " + payload
@@ -89,6 +89,7 @@ parser.add_option("-i", "--ip", dest="ipaddress", metavar="IPADDRESS", help="IP 
 
 debugGroup = OptionGroup(parser, "Debugging Options")
 debugGroup.add_option("-t", "--test", dest="test", action="store_true", help="use sagepay test server")
+debugGroup.add_option("-l", "--live", dest="live", action="store_true", help="use sagepay live server [default]")
 parser.add_option_group(debugGroup)
 
 (options, args) = parser.parse_args()
@@ -104,6 +105,10 @@ if options.vendor == None or options.username == None or options.password == Non
 	sys.exit(-1)
 
 sagePay = SagePay(options.vendor, options.username, options.password)
+
+if options.test and options.live:
+	print "--live and --test are mutually exclusive"
+	sys.exit(-1)
 
 if options.test: 
 	sagePay.testing()
